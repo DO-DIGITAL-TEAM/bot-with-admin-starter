@@ -1,0 +1,64 @@
+services:
+  database:
+    container_name: ${PROJECT_NAME}_database
+    hostname: postgres
+    image: postgres:17.4
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - db_data:/var/lib/postgresql/pgdata
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/pgdata
+    networks:
+      - main_network
+    restart: always
+
+  back:
+    container_name: ${PROJECT_NAME}_back
+    image: your-registry/back:latest
+    environment:
+      PORT: ${BACK_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+  
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    networks:
+      - main_network
+    ports:
+      - ${BACK_PORT}:${BACK_PORT}
+    depends_on:
+      - database
+    restart: always
+    command: sh -c "pnpm migration:run && pnpm start"
+
+  front:
+    container_name: ${PROJECT_NAME}_front
+    image: your-registry/front:latest
+    environment:
+      NODE_ENV: production
+      PORT: ${FRONT_PORT}
+    restart: always
+    depends_on:
+      - back
+    networks:
+      - main_network
+    ports:
+      - ${FRONT_PORT}:3000
+    command: npm start
+
+networks:
+  main_network:
+    name: ${PROJECT_NAME}_network
+    driver: bridge
+
+volumes:
+  db_data:
+    name: ${PROJECT_NAME}_volume
