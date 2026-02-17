@@ -1,12 +1,26 @@
-import { BadRequestException, createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { IsNull, Not, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, ILike, In, Between } from "typeorm";
+import {
+  BadRequestException,
+  createParamDecorator,
+  ExecutionContext,
+} from '@nestjs/common';
 import { Request } from 'express';
+import {
+  Between,
+  ILike,
+  In,
+  IsNull,
+  LessThan,
+  LessThanOrEqual,
+  MoreThan,
+  MoreThanOrEqual,
+  Not,
+} from 'typeorm';
 import { ErrorCode } from '../enums/error-code.enum';
 
 export type EntityFields<T> = (keyof T)[];
 
 export interface IFiltering {
-  [field: string]: string;
+  [key: string]: unknown;
 }
 
 interface IFilteringParams {
@@ -37,46 +51,115 @@ export const getWhere = (filter: IFilteringParams) => {
 
   if (filter.rule == FilterRule.IS_NULL) return IsNull();
   if (filter.rule == FilterRule.IS_NOT_NULL) return Not(IsNull());
-  if (filter.rule == FilterRule.EQUALS) return filter.value;
-  if (filter.rule == FilterRule.NOT_EQUALS) return Not(filter.value);
+  if (filter.rule == FilterRule.EQUALS) {
+    if (!filter.value || filter.value.trim() === '') return {};
+    return filter.value;
+  }
+  if (filter.rule == FilterRule.NOT_EQUALS) {
+    if (!filter.value || filter.value.trim() === '') return {};
+    return Not(filter.value);
+  }
   if (filter.rule == FilterRule.GREATER_THAN) return MoreThan(filter.value);
   if (filter.rule == FilterRule.GREATER_THAN_OR_EQUALS) return MoreThanOrEqual(filter.value);
   if (filter.rule == FilterRule.LESS_THAN) return LessThan(filter.value);
   if (filter.rule == FilterRule.LESS_THAN_OR_EQUALS) return LessThanOrEqual(filter.value);
   if (filter.rule == FilterRule.LIKE) return ILike(`%${filter.value}%`);
   if (filter.rule == FilterRule.NOT_LIKE) return Not(ILike(`%${filter.value}%`));
-  if (filter.rule == FilterRule.IN) return In(filter.value.split(','));
-  if (filter.rule == FilterRule.NOT_IN) return Not(In(filter.value.split(',')));
-  if (filter.rule == FilterRule.BETWEEN) return Between(...(filter.value.split(',') as [string, string]));
-}
-
-export const FilteringParams = createParamDecorator((data, ctx: ExecutionContext): IFiltering => {
-  const req: Request = ctx.switchToHttp().getRequest();
-  const queryFilters = req.query.filters as string[];
-
-  if (!queryFilters || !Array.isArray(queryFilters)) return null;
-
-  if (typeof data !== 'object') throw new BadRequestException(ErrorCode.InvalidFilterParams);
-
-  let filters: { [field: string]: any } = {};
-
-  for (const filter of queryFilters) {
-    const [fieldPath, rule, value] = filter.split(':');
-
-    const fieldParts = fieldPath.split('.');
-    const field = fieldParts.pop();
-    let nestedFilters = filters;
-    for (const part of fieldParts) {
-      nestedFilters[part] = nestedFilters[part] || {};
-      nestedFilters = nestedFilters[part];
-    }
-
-    if (!data.includes(fieldPath)) throw new BadRequestException(`${ErrorCode.FilterFieldNotAllowed}:${field}`);
-    if (!Object.values(FilterRule).includes(rule as FilterRule)) throw new BadRequestException(`${ErrorCode.InvalidFilterParams}:${rule}`);
-
-    const whereClause = getWhere({ field, rule, value });
-    nestedFilters[field] = whereClause;
+  if (filter.rule == FilterRule.IN) {
+    const values = filter.value.split(',').filter((v) => v.trim() !== '');
+    return values.length > 0 ? In(values) : {};
+  }
+  if (filter.rule == FilterRule.NOT_IN) {
+    const values = filter.value.split(',').filter((v) => v.trim() !== '');
+    return values.length > 0 ? Not(In(values)) : {};
+  }
+  if (filter.rule == FilterRule.BETWEEN) {
+    const [from, to] = filter.value.split(',') as [string?, string?];
+    if (!from || !to) return {};
+    return Between(from, to);
   }
 
-  return filters;
-});
+  return {};
+}
+
+function ensureObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export const FilteringParams = createParamDecorator(
+  (data: readonly string[], ctx: ExecutionContext): IFiltering | null => {
+    const req: Request = ctx.switchToHttp().getRequest();
+    const rawFilters = req.query.filters;
+    const queryFilters = Array.isArray(rawFilters)
+      ? rawFilters
+      : typeof rawFilters === 'string'
+        ? [rawFilters]
+        : null;
+
+    if (!queryFilters) return null;
+    if (!Array.isArray(data)) throw new BadRequestException(ErrorCode.InvalidFilterParams);
+
+    const filters: IFiltering = {};
+
+    for (const filter of queryFilters) {
+      if (typeof filter !== 'string') {
+        throw new BadRequestException(ErrorCode.InvalidFilterParams);
+      }
+
+      const [fieldPath, rule, value] = filter.split(':');
+
+      if (!fieldPath || !rule || value === undefined) {
+        throw new BadRequestException(ErrorCode.InvalidFilterParams);
+      }
+
+      const fieldParts = fieldPath.split('.');
+      const field = fieldParts.pop();
+
+      if (!field) {
+        throw new BadRequestException(ErrorCode.InvalidFilterParams);
+      }
+
+      let nestedFilters: Record<string, unknown> = filters;
+      
+      for (const part of fieldParts) {
+        const existing = nestedFilters[part];
+
+        if (!ensureObjectRecord(existing)) {
+          nestedFilters[part] = {};
+        }
+
+        nestedFilters = nestedFilters[part] as Record<string, unknown>;
+      }
+
+      if (!data.includes(fieldPath)) {
+        throw new BadRequestException(`${ErrorCode.FilterFieldNotAllowed}:${field}`);
+      }
+
+      if (!Object.values(FilterRule).includes(rule as FilterRule)) {
+        throw new BadRequestException(`${ErrorCode.InvalidFilterParams}:${rule}`);
+      }
+
+      const isEmptyValueRule = [
+        FilterRule.EQUALS,
+        FilterRule.NOT_EQUALS,
+        FilterRule.IN,
+        FilterRule.NOT_IN,
+      ].includes(rule as FilterRule) && (!value || value.trim() === '');
+
+      if (isEmptyValueRule) {
+        continue;
+      }
+
+      const whereClause = getWhere({ field, rule, value });
+
+      if (ensureObjectRecord(whereClause) && Object.keys(whereClause).length === 0) {
+        continue;
+      }
+
+      nestedFilters[field] = whereClause;
+    }
+
+    return filters;
+  },
+);
+

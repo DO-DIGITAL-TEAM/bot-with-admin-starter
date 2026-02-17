@@ -3,9 +3,13 @@
 A starter template for building a Telegram bot with a web-based admin panel.
 
 **Stack:**
-- **Backend:** NestJS, TypeORM, PostgreSQL, Grammy (Telegram Bot)
+- **Backend:** NestJS 11, TypeORM, PostgreSQL, Grammy (Telegram Bot)
 - **Frontend:** React, Vite, Mantine UI
 - **Infrastructure:** Docker Compose
+
+**Requirements:**
+- Node.js v20+ (v22 recommended)
+- pnpm 9+
 
 ## Getting Started
 
