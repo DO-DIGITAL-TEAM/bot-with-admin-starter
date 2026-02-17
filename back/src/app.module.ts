@@ -9,6 +9,7 @@ import { BotModule } from './bot/bot.module';
 import { CommonModule } from './common/common.module';
 import { validate } from './config/env/validate';
 import { DatabaseModule } from './database/database.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DatabaseModule } from './database/database.module';
     AdminsModule,
     AuthModule,
     AdminConsoleModule,
+    UsersModule,
     BotModule,
   ],
   controllers: [AppController],

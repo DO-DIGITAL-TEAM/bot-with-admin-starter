@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Password } from 'src/admins/entities/password.entity';
 import { Admin } from 'src/admins/entities/admin.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Admin } from 'src/admins/entities/admin.entity';
         entities: [
           Admin,
           Password,
+          User,
         ]
       }),
     }),
