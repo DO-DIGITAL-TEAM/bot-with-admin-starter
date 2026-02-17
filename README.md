@@ -1,4 +1,4 @@
-# Telegram Bot with Admin Panel — Starter
+# Telegram Bot with Admin Panel Starter
 
 A starter template for building a Telegram bot with a web-based admin panel.
 
