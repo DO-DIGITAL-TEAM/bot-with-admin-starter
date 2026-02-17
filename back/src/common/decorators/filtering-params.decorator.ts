@@ -29,7 +29,22 @@ interface IFilteringParams {
   value: string;
 }
 
-// valid filter rules
+/**
+ * Valid filter rules for query parameter filtering.
+ * 
+ * Used with FilteringParams decorator to filter database queries.
+ * 
+ * @example
+ * ```typescript
+ * // In controller
+ * @Get()
+ * findChunk(@FilteringParams(['username', 'role']) filtering: IFiltering) {
+ *   return this.service.findChunk(filtering);
+ * }
+ * 
+ * // Query: ?filters[]=username:like:john&filters[]=role:eq:admin
+ * ```
+ */
 export enum FilterRule {
   EQUALS = 'eq',
   NOT_EQUALS = 'neq',
@@ -46,6 +61,15 @@ export enum FilterRule {
   BETWEEN = 'between',
 }
 
+/**
+ * Converts filter parameters to TypeORM where clause.
+ * 
+ * @param filter - Filter parameters with field, rule, and value
+ * @returns TypeORM where clause object or empty object if invalid
+ * 
+ * @internal
+ * This function is used internally by FilteringParams decorator.
+ */
 export const getWhere = (filter: IFilteringParams) => {
   if (!filter) return {};
 
@@ -86,6 +110,33 @@ function ensureObjectRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/**
+ * Custom decorator for parsing and validating filter query parameters.
+ * 
+ * Supports nested filtering with dot notation (e.g., 'user.name:like:john').
+ * Filters are passed as query parameter array: `filters[]=field:rule:value`
+ * 
+ * @param allowedFields - Array of field names that can be filtered
+ * @returns Decorator that extracts and validates filter parameters
+ * 
+ * @example
+ * ```typescript
+ * // In controller
+ * @Get()
+ * findChunk(
+ *   @FilteringParams(['username', 'role', 'is_active']) filtering: IFiltering
+ * ) {
+ *   return this.service.findChunk(filtering);
+ * }
+ * 
+ * // Query examples:
+ * // ?filters[]=username:like:john
+ * // ?filters[]=role:eq:admin&filters[]=is_active:eq:true
+ * // ?filters[]=id:between:10,20
+ * ```
+ * 
+ * @throws BadRequestException if filter format is invalid or field is not allowed
+ */
 export const FilteringParams = createParamDecorator(
   (data: readonly string[], ctx: ExecutionContext): IFiltering | null => {
     const req: Request = ctx.switchToHttp().getRequest();

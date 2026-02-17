@@ -1,0 +1,99 @@
+# Telegram Bot with Admin Panel Starter - Cursor Rules
+
+## Project Overview
+This is a starter template for building Telegram bots with web-based admin panels.
+
+**Tech Stack:**
+- Backend: NestJS 11, TypeORM, PostgreSQL, Grammy (Telegram Bot Framework)
+- Frontend: React 18, Vite, Mantine UI 7, React Query, Zod
+- Infrastructure: Docker Compose
+
+## Code Style & Conventions
+
+### TypeScript
+- Use strict typing - avoid `any` when possible
+- Prefer interfaces over types for object shapes
+- Use enums for fixed sets of values
+- Always define return types for functions
+- Use JSDoc comments for public APIs
+
+### NestJS Backend
+- Follow NestJS module structure: Controller → Service → Repository pattern
+- Use DTOs with class-validator for all request/response validation
+- Use decorators from `@nestjs/common` consistently
+- Services should contain business logic, controllers only handle HTTP
+- Use dependency injection - avoid direct instantiation
+- Use guards for authentication/authorization
+- Use interceptors for response transformation
+- Use custom decorators for common patterns (pagination, filtering, sorting)
+
+### React Frontend
+- Use functional components with hooks
+- Use React Query for all API calls
+- Use Zod schemas for type-safe API validation
+- Use Mantine components consistently
+- Create reusable hooks for common patterns
+- Use TypeScript paths (@/*) for imports
+- Keep components small and focused
+
+### Database
+- Use TypeORM entities with decorators
+- All entities extend `AbstractEntity` (id, created_at, updated_at)
+- Use migrations for all schema changes
+- Never use `synchronize: true` in production
+- Use relations properly (OneToOne, OneToMany, ManyToMany)
+
+### API Design
+- RESTful endpoints: GET, POST, PATCH, DELETE
+- Use consistent response format: `{ statusCode, message, data }`
+- Pagination: `page` (1-indexed) and `size` (default 25)
+- Sorting: `sortBy` and `sortOrder` (asc/desc)
+- Filtering: use `FilteringParams` decorator with filter rules (eq, neq, like, etc.)
+- Use JWT for authentication
+- Protect routes with `@UseGuards(AuthGuard)`
+
+### File Naming
+- Controllers: `*.controller.ts`
+- Services: `*.service.ts`
+- Entities: `*.entity.ts`
+- DTOs: `*.dto.ts`
+- Guards: `*.guard.ts`
+- Decorators: `*.decorator.ts`
+- Modules: `*.module.ts`
+
+### Git
+- Use conventional commits
+- Keep commits focused and atomic
+- Never commit `.env` files or secrets
+
+## Common Patterns
+
+### Creating a New Feature Module
+1. Create module folder: `back/src/feature-name/`
+2. Create entity: `entities/feature-name.entity.ts`
+3. Create DTOs: `dto/create-feature-name.dto.ts`, `dto/update-feature-name.dto.ts`
+4. Create service: `feature-name.service.ts`
+5. Create controller: `feature-name.controller.ts`
+6. Create module: `feature-name.module.ts`
+7. Register in `app.module.ts`
+8. Create migration: `pnpm migration:generate --name=create-feature-name`
+
+### Adding Bot Commands
+1. Add handler method in `BotService`
+2. Register in `onModuleInit()`: `this.bot.command('command', this.handler.bind(this))`
+3. Use Grammy Context types for type safety
+
+### Adding Frontend Pages
+1. Create page component in `front/src/pages/`
+2. Add route in `front/src/routes/`
+3. Create API hooks in `front/src/hooks/api/`
+4. Create Zod schemas in `front/src/api/dtos/`
+5. Use Mantine components for UI
+
+## Important Notes
+- Always validate environment variables in `config/env/env.validation.ts`
+- Use `ConfigService` to access environment variables
+- Static files served from `/uploads` endpoint
+- Database migrations run automatically on container start
+- Use `pnpm` as package manager (not npm or yarn)
+- Node.js v20+ required (v22 recommended)

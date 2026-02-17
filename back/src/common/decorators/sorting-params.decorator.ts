@@ -2,12 +2,48 @@ import { BadRequestException, createParamDecorator, ExecutionContext } from '@ne
 import { Request } from 'express';
 import { ErrorCode } from '../enums/error-code.enum';
 
+/**
+ * Sort direction for database queries.
+ */
 type Direction = 'ASC' | 'DESC';
 
+/**
+ * Sorting parameters extracted from query string.
+ * 
+ * @example
+ * ```typescript
+ * // Query: ?sort=created_at:DESC
+ * // Results in: { created_at: 'DESC' }
+ * ```
+ */
 export interface ISorting {
+  /** Field name mapped to sort direction */
   [field: string]: Direction;
 }
 
+/**
+ * Custom decorator for parsing sorting query parameters.
+ * 
+ * Extracts `sort` from query string in format `field:direction`.
+ * Validates that the field is in the allowed list.
+ * 
+ * @param validParams - Array of field names that can be sorted
+ * @returns Decorator that extracts and validates sort parameters
+ * 
+ * @example
+ * ```typescript
+ * // In controller
+ * @Get()
+ * findChunk(@SortingParams(['id', 'created_at', 'username']) sorting: ISorting) {
+ *   return this.service.findChunk(sorting);
+ * }
+ * 
+ * // Query: ?sort=created_at:DESC
+ * // Results in: { created_at: 'DESC' }
+ * ```
+ * 
+ * @throws BadRequestException if sort format is invalid or field is not allowed
+ */
 export const SortingParams = createParamDecorator((validParams, ctx: ExecutionContext): ISorting => {
   const req: Request = ctx.switchToHttp().getRequest();
   const sort = req.query.sort as string;

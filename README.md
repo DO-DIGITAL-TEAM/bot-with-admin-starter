@@ -94,3 +94,24 @@ pnpm migration:generate --name=my-migration-name
 - Dark/light theme
 - Docker-based development & production setup
 - Database backup with Telegram notification
+
+## 🤖 Development with AI Assistants
+
+This project is optimized for development with LLM assistants like Cursor AI, GitHub Copilot, etc.
+
+### Key Files for AI Understanding:
+- **`.cursorrules`** - Project conventions, code style, and common patterns
+- **`AGENTS.md`** - Comprehensive architecture documentation and system design
+- **`EXAMPLES.md`** - API usage examples, code patterns, and implementation guides
+
+### Quick Start for AI:
+1. Read `.cursorrules` for code style and conventions
+2. Check `AGENTS.md` for architecture overview and module structure
+3. See `EXAMPLES.md` for implementation patterns and API usage
+4. Follow the module structure: Entity → DTO → Service → Controller → Module
+
+### Common Tasks:
+- **Adding a new feature**: See `AGENTS.md` → Development Workflow
+- **Creating API endpoints**: See `EXAMPLES.md` → Frontend Usage Examples
+- **Adding bot commands**: See `EXAMPLES.md` → Telegram Bot Examples
+- **Database migrations**: See `EXAMPLES.md` → Database Migration Examples

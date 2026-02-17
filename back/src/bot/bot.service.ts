@@ -39,6 +39,24 @@ export class BotService {
 
   /**
    * Send a message to a specific Telegram user.
+   * 
+   * @param telegramId - Telegram user chat ID (as string)
+   * @param message - Message text (supports Markdown)
+   * @param reply_markup - Optional keyboard (inline, reply, or remove)
+   * @throws Logs error if message sending fails
+   * 
+   * @example
+   * ```typescript
+   * // Simple message
+   * await botService.sendMessage('123456789', 'Hello!');
+   * 
+   * // With inline keyboard
+   * const keyboard = new InlineKeyboard()
+   *   .text('Button 1', 'data1')
+   *   .row()
+   *   .text('Button 2', 'data2');
+   * await botService.sendMessage('123456789', 'Choose:', keyboard);
+   * ```
    */
   public async sendMessage(
     telegramId: string,
