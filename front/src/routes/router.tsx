@@ -72,6 +72,49 @@ const router = createBrowserRouter([
           },
         ],
       },
+      /* ------------------------------- LOCALIZATION ------------------------------- */
+      {
+        path: paths.dashboard.localization.root,
+        children: [
+          {
+            index: true,
+            path: paths.dashboard.localization.root,
+            element: <Navigate to={paths.dashboard.localization.langs.root} replace />,
+          },
+          {
+            path: paths.dashboard.localization.langs.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.localization.langs.root,
+                element: <Navigate to={paths.dashboard.localization.langs.list} replace />,
+              },
+              {
+                path: paths.dashboard.localization.langs.list,
+                element: LazyPage(() => import('@/pages/dashboard/localization/langs/list')),
+              },
+            ],
+          },
+          {
+            path: paths.dashboard.localization.wordbooks.root,
+            children: [
+              {
+                index: true,
+                path: paths.dashboard.localization.wordbooks.root,
+                element: <Navigate to={paths.dashboard.localization.wordbooks.list} replace />,
+              },
+              {
+                path: paths.dashboard.localization.wordbooks.list,
+                element: LazyPage(() => import('@/pages/dashboard/localization/wordbooks/list')),
+              },
+              {
+                path: paths.dashboard.localization.wordbooks.edit,
+                element: LazyPage(() => import('@/pages/dashboard/localization/wordbooks/edit')),
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
 ]);

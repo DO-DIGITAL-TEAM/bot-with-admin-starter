@@ -1,6 +1,6 @@
-import { FC, ReactNode } from "react";
+import { AdminModal, LangModal, WordbookModal } from "@/components/widgets/modals";
 import { ModalsProvider } from '@mantine/modals';
-import { AdminModal } from "@/components/widgets/modals";
+import { FC, ReactNode } from "react";
 
 interface IProps {
   children: ReactNode;
@@ -8,6 +8,8 @@ interface IProps {
 
 const modals = {
   ADMIN: AdminModal,
+  LANG: LangModal,
+  WORDBOOK: WordbookModal,
 };
 
 export const MODAL_NAMES = Object.keys(modals).reduce((acc, key) => {

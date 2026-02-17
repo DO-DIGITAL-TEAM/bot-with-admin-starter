@@ -94,6 +94,85 @@ pnpm migration:generate --name=my-migration-name
 - Dark/light theme
 - Docker-based development & production setup
 - Database backup with Telegram notification
+- **Localization system** - Multi-language support for bot messages
+
+## 🌐 Localization System
+
+The project includes a comprehensive localization system that allows admins to manage translations for bot messages.
+
+### Overview
+
+The localization system consists of:
+- **Languages** (`langs`) - Supported languages with settings (slug, title, active status, text direction, date format)
+- **Wordbooks** (`wordbooks`) - Collections of words grouped by functionality (e.g., "commands", "errors", "messages")
+- **Words** (`words`) - Individual translation keys (marks) within a wordbook
+- **Translations** (`word_translations`) - Actual translated text for each word in each language
+
+### Admin Usage
+
+#### Managing Languages
+
+1. Navigate to **Dashboard → Localization → Languages**
+2. **Create a new language:**
+   - Click "Create Language"
+   - Fill in:
+     - **Slug**: Language code (e.g., `en`, `ru`, `uk`)
+     - **Title**: Display name (e.g., "English", "Русский")
+     - **Active**: Enable/disable language (only active languages are loaded for bot)
+     - **Direction**: Text direction (`ltr` or `rtl`)
+     - **Date Format**: Date format preference (`en` or `ru`)
+   - Save
+
+3. **Edit/Delete languages:**
+   - Click on a language in the table to edit
+   - Protected languages (marked as `defended`) cannot be deleted
+
+#### Managing Wordbooks
+
+1. Navigate to **Dashboard → Localization → Wordbooks**
+2. **Create a new wordbook:**
+   - Click "Create Wordbook"
+   - Fill in:
+     - **Name**: Unique wordbook identifier (e.g., `commands`, `errors`, `messages`)
+     - **Load To**: Where the wordbook is used:
+       - `all` - Available for both bot and admin panel
+       - `bot` - Only for Telegram bot
+   - Optionally add words during creation
+   - Save
+
+3. **Edit a wordbook:**
+   - Click on a wordbook in the table
+   - Edit wordbook name and `load_to` setting
+   - Manage words:
+     - **Add word**: Click "Add Word" button
+     - **Edit word**: Modify the mark (key) or translations
+     - **Delete word**: Click delete icon (⚠️ words with translations will be removed)
+
+#### Adding Translations
+
+1. Open a wordbook for editing
+2. For each word, you'll see translation fields for all active languages
+3. **Add translations:**
+   - Enter translated text in the corresponding language field
+   - Translations are saved automatically when you update the wordbook
+   - Empty translations are allowed (will be `null` in database)
+
+4. **Translation workflow:**
+   - When you add a new word, translation fields are automatically created for all existing languages
+   - When you add a new language, you'll need to add translations for existing words manually
+   - Use the language tabs to switch between languages while editing
+
+### Best Practices
+
+- **Wordbook naming**: Use descriptive, lowercase names (e.g., `commands`, `errors`, `buttons`)
+- **Word marks**: Use clear, descriptive keys (e.g., `start_command`, `error_not_found`, `button_submit`)
+- **Language slugs**: Follow ISO 639-1 standard (2-letter codes) or ISO 639-2 (3-letter codes)
+- **Protected items**: Mark system languages and wordbooks as `defended` to prevent accidental deletion
+- **Active languages**: Only mark languages as active if translations are ready (inactive languages won't be loaded by bot)
+
+### Bot Integration
+
+The bot automatically loads all active wordbooks marked with `load_to: 'all'` or `load_to: 'bot'` on startup. Translations are cached in memory for fast access. The cache is automatically reloaded when wordbooks are updated through the admin panel.
 
 ## 🤖 Development with AI Assistants
 

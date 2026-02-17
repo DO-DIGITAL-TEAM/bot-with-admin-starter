@@ -14,5 +14,17 @@ export const paths = {
         list: '/dashboard/management/admins/list',
       },
     },
+    localization: {
+      root: '/dashboard/localization',
+      langs: {
+        root: '/dashboard/localization/langs',
+        list: '/dashboard/localization/langs/list',
+      },
+      wordbooks: {
+        root: '/dashboard/localization/wordbooks',
+        list: '/dashboard/localization/wordbooks/list',
+        edit: '/dashboard/localization/wordbooks/edit/:id',
+      },
+    },
   },
 };

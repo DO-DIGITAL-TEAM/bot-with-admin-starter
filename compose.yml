@@ -45,6 +45,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: ${FRONT_PORT}
+      VITE_API_URL: ${API_URL}
     restart: always
     depends_on:
       - back

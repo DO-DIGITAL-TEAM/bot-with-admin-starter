@@ -44,13 +44,11 @@ services:
 
   front:
     container_name: ${PROJECT_NAME}_front
-    build:
-      context: ./front
-      args:
-        - VITE_API_URL=${API_URL}
+    build: ./front
     environment:
       NODE_ENV: development
       PORT: ${FRONT_PORT}
+      VITE_API_URL: ${API_URL}
       HOST: 0.0.0.0
     restart: unless-stopped
     volumes:

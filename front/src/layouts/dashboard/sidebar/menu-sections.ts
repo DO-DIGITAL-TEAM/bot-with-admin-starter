@@ -1,6 +1,8 @@
 import { ElementType } from 'react';
 import {
   PiUserPlusDuotone,
+  PiTranslateDuotone,
+  PiBooksDuotone,
 } from 'react-icons/pi';
 import { paths } from '@/routes/paths';
 
@@ -28,6 +30,23 @@ export const menu: MenuItem[] = [
         key: 'admins',
         icon: PiUserPlusDuotone,
         href: paths.dashboard.management.admins.list,
+      },
+    ],
+  },
+  {
+    header: 'Localization',
+    section: [
+      {
+        name: 'Languages',
+        key: 'langs',
+        icon: PiTranslateDuotone,
+        href: paths.dashboard.localization.langs.list,
+      },
+      {
+        name: 'Wordbooks',
+        key: 'wordbooks',
+        icon: PiBooksDuotone,
+        href: paths.dashboard.localization.wordbooks.list,
       },
     ],
   },

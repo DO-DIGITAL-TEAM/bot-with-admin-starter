@@ -25,9 +25,9 @@ export abstract class AbstractEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   public created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   public updated_at: Date;
 }

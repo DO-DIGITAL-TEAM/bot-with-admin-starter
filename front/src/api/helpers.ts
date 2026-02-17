@@ -120,7 +120,8 @@ function createUrl(
     });
   }
 
-  return `${url}?${query.toString()}`;
+  const queryString = query.toString();
+  return queryString ? `${url}?${queryString}` : url;
 }
 
 type QueryKey = [string] | [string, Record<string, string | number | undefined>];
@@ -261,7 +262,6 @@ export function createPostMutationHook<
 }: CreatePostMutationHookArgs<BodySchema, ResponseSchema>) {
   return (params?: { query?: QueryParams; route?: RouteParams }) => {
     const queryClient = useQueryClient();
-    const baseUrl = createUrl(endpoint, params?.query, params?.route);
 
     const mutationFn = async ({
       variables,
@@ -272,7 +272,7 @@ export function createPostMutationHook<
       query?: QueryParams;
       route?: RouteParams;
     }) => {
-      const url = createUrl(baseUrl, query, route);
+      const url = createUrl(endpoint, query || params?.query, route || params?.route);
 
       const config = options?.isMultipart
         ? { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -345,7 +345,6 @@ export function createPatchMutationHook<
 }: CreatePatchMutationHookArgs<BodySchema, ResponseSchema>) {
   return (params?: { query?: QueryParams; route?: RouteParams }) => {
     const queryClient = useQueryClient();
-    const baseUrl = createUrl(endpoint, params?.query, params?.route);
     const mutationFn = async ({
       variables,
       route,
@@ -355,7 +354,7 @@ export function createPatchMutationHook<
       query?: QueryParams;
       route?: RouteParams;
     }) => {
-      const url = createUrl(baseUrl, query, route);
+      const url = createUrl(endpoint, query || params?.query, route || params?.route);
 
       const config = options?.isMultipart
         ? { headers: { 'Content-Type': 'multipart/form-data' } }

@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Password } from 'src/admins/entities/password.entity';
 import { Admin } from 'src/admins/entities/admin.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Lang } from 'src/localization/entities/lang.entity';
+import { Wordbook } from 'src/localization/entities/wordbook.entity';
+import { Word } from 'src/localization/entities/word.entity';
+import { WordTranslation } from 'src/localization/entities/word-translation.entity';
 
 @Module({
   imports: [
@@ -24,6 +28,10 @@ import { User } from 'src/users/entities/user.entity';
           Admin,
           Password,
           User,
+          Lang,
+          Wordbook,
+          Word,
+          WordTranslation,
         ]
       }),
     }),
